@@ -55,14 +55,7 @@ process_submit <- function() {
 # The curly braces are glue patterns that the
 # process_submit() function populates.
 process_script <-  "#!/bin/bash
-#$ -N {id}          # Job name. Should be unique, short enough that qstat does not truncate it.
-#$ -j y             # Combine SGE stdout and stderr into one log file.
-#$ -o {log_sge}     # Log file.
-#$ -cwd             # Submit from the current working directory.
-#$ -V               # Use environment variables
-#$ -l h_rt=04:00:00 # Maximum runtime is 4 hours.
-module load R       # Load R as an environment module on the cluster. Pick the right version if applicable.
-Rscript -e 'targets::tar_make(callr_arguments = list(stdout = \"{log_stdout}\", stderr = \"{log_stderr}\"), script = \"{script}\", store = \"{store}\")'"
+/opt/R/4.1.1/bin/Rscript -e 'targets::tar_make(callr_arguments = list(stdout = \"{log_stdout}\", stderr = \"{log_stderr}\"), script = \"{script}\", store = \"{store}\")'"
 
 # Get the SGE job ID of the pipeline.
 process_id <- function() {
@@ -80,7 +73,7 @@ process_running <- function() {
   id <- process_id()
   project_exists() &&
     !anyNA(id) &&
-    any(grepl(id, system2("qstat", stdout = TRUE)))
+    any(grepl(id, system2("squeue", stdout = TRUE)))
 }
 
 # Status indicator that changes whenever a pipeline starts or stops.
